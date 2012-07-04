@@ -1,0 +1,15 @@
+ - file headers with copyright, ...
+ - tcl.pas: check the automatic translations of #defines
+ - tcloop.pas: documentation
+ - automatically CreateObjCommand, look at FpcUnit how they use RTTI to get a
+   list of methods
+ - overload TTclInterpreter and register a few commands: "sleep" (-> "after",
+   see http://wiki.tcl.tk/933), "writeln", ...
+ - a lot more documentation, incl. links to official TCL docs
+ - cleanup #define translations at the bottom of tcl.pas
+ - handle "exit" with Tcl_SetExitProc
+   http://www.tcl.tk/man/tcl8.5/TclLib/Exit.htm
+ - remove debugging output
+ - command line completion http://www.tcl.tk/man/tcl8.5/TclLib/CmdCmplt.htm
+ - namespeaces http://www.tcl.tk/man/tcl8.5/TclLib/Namespace.htm
+ - dictionaries http://www.tcl.tk/man/tcl8.5/TclLib/DictObj.htm
