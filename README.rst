@@ -53,6 +53,21 @@ Simply add the units ``TCL`` and ``TclOOP`` to the uses-clause of your
 program. Then follow `src/examples/demo2.pas
 <pas-tcl/blob/master/src/examples/demo2.pas>`_.
 
+Alternatively you can use the class ``TTclCmdLine`` in `src/tclcmdline.pas
+<pas-tcl/blob/master/src/tclcmdline.pas>`_. This includes a command line
+interface using the `GNU Readline library with a Pascal wrapper
+<https://github.com/hansiglaser/pas-readline>`_.
+
+The class ``TTclCmdLinePredef`` in `src/tclcmdlinepredef.pas
+<pas-tcl/blob/master/src/tclcmdlinepredef.pas>`_ is derived from
+``TTclCmdLine`` and implements some useful TCL commands like ``man`` and
+``history``. It also re-implements ``exit`` to provide a graceful exit of
+the command loop and finalization of the application.
+
+In `src/tclapp.pas <pas-tcl/blob/master/src/tclapp.pas>`_, the class
+``TTclApp`` uses ``TTclCmdLinePredef`` to implement a basic command line
+application. Derive from this class and implement your own (additional) TCL
+commands to build a powerful TCL command line application.
 
 Platform
 --------
