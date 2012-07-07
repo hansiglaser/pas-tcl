@@ -267,6 +267,8 @@ Begin
    *)
   if not FFreeFromEval then
     Tcl_DeleteInterp(FInterp);      // Release interpreter
+  // finalize TCL
+  Tcl_Finalize;
   Inherited Destroy;
 End;
 
