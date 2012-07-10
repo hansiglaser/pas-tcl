@@ -123,6 +123,7 @@ Type
     //procedure AppendResult(args: array of PChar);
     Procedure AppendResult(St:String);
     Procedure SetObjResult(resultObjPtr:PTcl_Obj);
+    Procedure SetObjResult(intValue:Integer);
     Procedure SetResult(St:String);
     Function  NewIntObj(intValue:Integer) : PTcl_Obj;
     Function  GetIntFromObj(pObj:pTcl_Obj; Out Int:Integer):Integer;
@@ -367,6 +368,11 @@ End;
 Procedure TTCLInterpreter.SetObjResult(resultObjPtr:PTcl_Obj);
 Begin
   Tcl_SetObjResult(FInterp,resultObjPtr);
+End;
+
+Procedure TTCLInterpreter.SetObjResult(intValue : Integer);
+Begin
+  Tcl_SetObjResult(FInterp,Tcl_NewIntObj(intValue));
 End;
 
 Procedure TTCLInterpreter.SetResult(St:String);
