@@ -15,8 +15,13 @@
 
 # Configuration ############################################################
 
+if [ $# -ne 1 ] ; then
+  echo "Usage: $0 filename"
+  exit 1
+fi
+
 # input file
-INFILE=eztools.pas
+INFILE="$1"
 # output directory
 OUTDIR=./man
 
