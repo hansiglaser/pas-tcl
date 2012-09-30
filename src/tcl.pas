@@ -1,3 +1,15 @@
+(***************************************************************************
+ *   Copyright (C) 2012 by Johann Glaser <Johann.Glaser@gmx.at>            *
+ *                                                                         *
+ *   Pascal unit translated from the externally-visible facilities of the  *
+ *   Tcl interpreter.                                                      *
+ *                                                                         *
+ *   This Pascal unit is licensed under the same terms as the original     *
+ *   Tcl C header file. See the file "license.terms" for information on    *
+ *   usage and redistribution of this file, and for a DISCLAIMER OF ALL    *
+ *   WARRANTIES.                                                           *
+ *                                                                         *
+ ***************************************************************************)
 {$MODE ObjFPC}
 Unit TCL;
 

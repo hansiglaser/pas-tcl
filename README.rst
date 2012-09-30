@@ -10,22 +10,13 @@ wrapper for convenience. Code examples on the usage are included.
 License
 -------
 
-    Copyright (C) 2012 Johann Glaser <Johann.Glaser@gmx.at>
+Each file contains a header showing the according license.
 
-    This program is free software; you can redistribute it and/or modify  
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or  
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
+ - Tcl and its header translation is licensed under the Tcl license (see the
+   file "license.terms").
+ - All Pascal units and examples are licensed under the same terms.
+ - Note that some Pascal units link to GNU Readline which is licensed under
+   the GPL.
 
 Directory Structure
 -------------------

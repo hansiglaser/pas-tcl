@@ -1,3 +1,15 @@
+(***************************************************************************
+ *   Copyright (C) 2012 by Johann Glaser <Johann.Glaser@gmx.at>            *
+ *                                                                         *
+ *   Command line interpreter using GNU Readline and Tcl.                  *
+ *                                                                         *
+ *   This Pascal unit is licensed under the same terms as the original     *
+ *   Tcl C header file. See the file "license.terms" for information on    *
+ *   usage and redistribution of this file, and for a DISCLAIMER OF ALL    *
+ *   WARRANTIES.                                                           *
+ *                                                                         *
+ ***************************************************************************)
+
 Unit TclCmdLine;
 
 {$mode objfpc}{$H+}
@@ -15,7 +27,7 @@ Type
    * Command line handler for TCL interpreter
    *
    * Important: Only a single instance of this class is allowed! The reason is
-   * that only one one ^C signal handler is available.
+   * that only one ^C signal handler is available.
    *)
   TTclCmdLine = class(TCmdLine)
   protected

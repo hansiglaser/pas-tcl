@@ -1,3 +1,15 @@
+(***************************************************************************
+ *   Copyright (C) 2012 by Johann Glaser <Johann.Glaser@gmx.at>            *
+ *                                                                         *
+ *   Pascal include file translated from the declarations of platform      *
+ *   specific Tcl APIs.                                                    *
+ *                                                                         *
+ *   This Pascal file is licensed under the same terms as the original     *
+ *   Tcl C header file. See the file "license.terms" for information on    *
+ *   usage and redistribution of this file, and for a DISCLAIMER OF ALL    *
+ *   WARRANTIES.                                                           *
+ *                                                                         *
+ ***************************************************************************)
 (*
  * tclPlatDecls.h --
  *
