@@ -39,14 +39,14 @@ type
  *)
 
 {$ifdef __WIN32__ /* WIN */}
-function Tcl_WinUtfToTChar(str:PChar; len:cint; dsPtr:PTcl_DString):PTCHAR;cdecl;external;
-function Tcl_WinTCharToUtf(str:PTCHAR; len:cint; dsPtr:PTcl_DString):PChar;cdecl;external;
+function Tcl_WinUtfToTChar(str:PChar; len:cint; dsPtr:PTcl_DString):PTCHAR;extdecl;external;
+function Tcl_WinTCharToUtf(str:PTCHAR; len:cint; dsPtr:PTcl_DString):PChar;extdecl;external;
 {$endif}  { WIN }
 
 {$ifdef MAC_OSX_TCL /* MACOSX */}
-function Tcl_MacOSXOpenBundleResources(interp:PTcl_Interp; bundleName:PChar; hasResourceFile:cint; maxPathLen:cint; libraryPath:PChar):cint;cdecl;external;
+function Tcl_MacOSXOpenBundleResources(interp:PTcl_Interp; bundleName:PChar; hasResourceFile:cint; maxPathLen:cint; libraryPath:PChar):cint;extdecl;external;
 function Tcl_MacOSXOpenVersionedBundleResources(interp:PTcl_Interp; bundleName:PChar; bundleVersion:PChar; hasResourceFile:cint; maxPathLen:cint;
-           libraryPath:PChar):cint;cdecl;external;
+           libraryPath:PChar):cint;extdecl;external;
 {$endif}  { MACOSX }
 
 Type
@@ -55,7 +55,7 @@ Type
       magic : cint;
       hooks : Pointer {PTclPlatStubHooks};
 {$ifdef __WIN32__ /* WIN */}
-      tcl_WinUtfToTChar : function (str:PChar; len:cint; dsPtr:PTcl_DString):PTCHAR;cdecl;
+      tcl_WinUtfToTChar : function (str:PChar; len:cint; dsPtr:PTcl_DString):PTCHAR;extdecl;
       tcl_WinTCharToUtf : function (str:PTCHAR; len:cint; dsPtr:PTcl_DString):PChar;
 {$endif}  { WIN }
 {$ifdef MAC_OSX_TCL /* MACOSX */}

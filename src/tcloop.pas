@@ -26,6 +26,13 @@ Unit TclOOP;
 
 {$MODE ObjFpc}{$H+}
 
+{$macro on}
+{$ifdef windows}
+  {$define extdecl:=stdcall}
+{$else}
+  {$define extdecl:=cdecl}
+{$endif}
+
 Interface
 
 Uses
@@ -202,7 +209,7 @@ Type
    * all abstract methods.
    *
    * GetTypePtr has to return a pointer to a Tcl_ObjType record with the four
-   * function pointers approprietly set. Use the three cdecl functions below
+   * function pointers approprietly set. Use the three extdecl functions below
    * and implement your own SetFormAnyProc.
    *)
   TTCLObj = class
@@ -225,9 +232,9 @@ Type
   End;
   TTCLObjClass = class of TTCLObj;
 
-Procedure UpdateStringProc(Obj:PTcl_Obj); cdecl;
-Procedure DupIntRepProc   (Src:PTcl_Obj;Dst:PTcl_Obj); cdecl;
-Procedure FreeIntRepProc  (Obj:PTcl_Obj); cdecl;
+Procedure UpdateStringProc(Obj:PTcl_Obj); extdecl;
+Procedure DupIntRepProc   (Src:PTcl_Obj;Dst:PTcl_Obj); extdecl;
+Procedure FreeIntRepProc  (Obj:PTcl_Obj); extdecl;
 
 { helpber functions }
 
@@ -277,7 +284,7 @@ End;
  * This function is used for every registered custom TCL commands implemented
  * as Pascal Functions.
  *)
-Function CmdCaller(clientData:ClientData;interp:pTcl_Interp;objc:Integer;objv:PPTcl_Obj): Integer; cdecl;
+Function CmdCaller(clientData:ClientData;interp:pTcl_Interp;objc:Integer;objv:PPTcl_Obj): Integer; extdecl;
 Var ProcInfo : PTclCmdProcInfo;
 Begin
   ProcInfo := PTclCmdProcInfo(clientData);
@@ -299,7 +306,7 @@ End;
  * This function is used for every registered custom TCL commands implemented
  * as Pascal Functions to remove.
  *)
-Procedure CmdDeleter(clientData:ClientData); cdecl;
+Procedure CmdDeleter(clientData:ClientData); extdecl;
 Var ProcInfo : PTclCmdProcInfo;
 Begin
   { call delete procedure }
@@ -523,7 +530,7 @@ Begin
   Result := Tcl_AsyncCreate(proc, clientData);
 End;
 
-Function AsyncSignalHandler(clientData:ClientData; var interp:Tcl_Interp; code:Integer):Integer;cdecl;
+Function AsyncSignalHandler(clientData:ClientData; var interp:Tcl_Interp; code:Integer):Integer;extdecl;
 Var ProcInfo : PTclAsyncProcInfo;
 Begin
   ProcInfo := PTclAsyncProcInfo(clientData);
@@ -711,7 +718,7 @@ End;
  * This is necessary becase here we can't know what is the desired class to
  * create.
  *)
-Function SetFromAnyProc(Interp:PTcl_Interp;Obj:PTcl_Obj):Integer;cdecl;
+Function SetFromAnyProc(Interp:PTcl_Interp;Obj:PTcl_Obj):Integer;extdecl;
 Var MyObj : TTclObj;
 Begin
 WriteLn('SetFromAny');
@@ -720,7 +727,7 @@ WriteLn('SetFromAny');
   Result := MyObj.SetFromAny(Interp);
 End;
 
-Procedure UpdateStringProc(Obj:PTcl_Obj);cdecl;
+Procedure UpdateStringProc(Obj:PTcl_Obj);extdecl;
 Var St : String;
 Begin
 WriteLn('UpdateString');
@@ -731,7 +738,7 @@ WriteLn('UpdateString');
   Obj^.Length := Length(St);
 End;
 
-Procedure DupIntRepProc(Src:PTcl_Obj;Dst:PTcl_Obj);cdecl;
+Procedure DupIntRepProc(Src:PTcl_Obj;Dst:PTcl_Obj);extdecl;
 Var SrcData,DstData : TTclObj;
     SrcClass        : TTCLObjClass;
 Begin
@@ -743,7 +750,7 @@ WriteLn('DupIntRep');
   Dst^.internalRep.ptrAndLongRep.Ptr := DstData;
 End;
 
-Procedure FreeIntRepProc(Obj:PTcl_Obj);cdecl;
+Procedure FreeIntRepProc(Obj:PTcl_Obj);extdecl;
 Begin
 WriteLn('MyDataFreeIntRep');
   TTCLObj.Get(Obj).Free;

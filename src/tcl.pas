@@ -21,6 +21,13 @@ Uses ctypes;
 {$PACKRECORDS C}
 {$ENDIF}
 
+{$macro on}
+{$ifdef windows}
+  {$define extdecl:=stdcall}
+{$else}
+  {$define extdecl:=cdecl}
+{$endif}
+
 {$LINKLIB tcl8.5}
 
 (*
@@ -467,7 +474,7 @@ type
   Tcl_Interp = record
       result : PChar;           (* If the last command returned a string
 				 * result, this points to it. *)
-      freeProc : procedure (blockPtr:PChar);cdecl;
+      freeProc : procedure (blockPtr:PChar);extdecl;
                                 (* Zero means the string result is statically
 				 * allocated. TCL_DYNAMIC means it was
 				 * allocated with ckalloc and should be freed
@@ -675,52 +682,52 @@ type
  * Function types defined by Tcl:
  *)
 
-  Tcl_AppInitProc = function(var interp:Tcl_Interp):cint;cdecl;
+  Tcl_AppInitProc = function(var interp:Tcl_Interp):cint;extdecl;
   Tcl_AsyncProc = function(clientData:ClientData; var interp:
-	Tcl_Interp; code:cint):cint;cdecl;
-  Tcl_ChannelProc = procedure(clientData:ClientData; mask:cint);cdecl;
-  Tcl_CloseProc = procedure(data:ClientData);cdecl;
-  Tcl_CmdDeleteProc = procedure(clientData:ClientData);cdecl;
-  Tcl_CmdProc = function(clientData:ClientData; interp:PTcl_Interp; argc:cint; argv:array of PChar):cint;cdecl;
+	Tcl_Interp; code:cint):cint;extdecl;
+  Tcl_ChannelProc = procedure(clientData:ClientData; mask:cint);extdecl;
+  Tcl_CloseProc = procedure(data:ClientData);extdecl;
+  Tcl_CmdDeleteProc = procedure(clientData:ClientData);extdecl;
+  Tcl_CmdProc = function(clientData:ClientData; interp:PTcl_Interp; argc:cint; argv:array of PChar):cint;extdecl;
   Tcl_CmdTraceProc = procedure(clientData:ClientData; interp:PTcl_Interp; level:cint; command:PChar; proc:Tcl_CmdProc;
-             cmdClientData:ClientData; argc:cint; argv:array of PChar);cdecl;
+             cmdClientData:ClientData; argc:cint; argv:array of PChar);extdecl;
   Tcl_CmdObjTraceProc = function(clientData:ClientData; interp:PTcl_Interp; level:cint; command:PChar; commandInfo:PTcl_Command;
-            objc:cint; var objv:PTcl_Obj):cint;cdecl;
-  Tcl_CmdObjTraceDeleteProc = procedure(clientData:ClientData);cdecl;
-  Tcl_DupInternalRepProc = procedure(srcPtr:PTcl_Obj; dupPtr:PTcl_Obj);cdecl;
+            objc:cint; var objv:PTcl_Obj):cint;extdecl;
+  Tcl_CmdObjTraceDeleteProc = procedure(clientData:ClientData);extdecl;
+  Tcl_DupInternalRepProc = procedure(srcPtr:PTcl_Obj; dupPtr:PTcl_Obj);extdecl;
   Tcl_EncodingConvertProc = function(clientData:ClientData; src:PChar; srcLen:cint; flags:cint; statePtr:PTcl_EncodingState;
-            dst:PChar; dstLen:cint; srcReadPtr:pcint; var dstWrotePtr:cint; var dstCharsPtr:cint):cint;cdecl;
-  Tcl_EncodingFreeProc = procedure(clientData:ClientData);cdecl;
-  Tcl_EventProc = function(evPtr:PTcl_Event; flags:cint):cint;cdecl;
-  Tcl_EventCheckProc = procedure(clientData:ClientData; flags:cint);cdecl;
-  Tcl_EventDeleteProc = function(evPtr:PTcl_Event; clientData:ClientData):cint;cdecl;
-  Tcl_EventSetupProc = procedure(clientData:ClientData; flags:cint);cdecl;
-  Tcl_ExitProc = procedure(clientData:ClientData);cdecl;
-  Tcl_FileProc = procedure(clientData:ClientData; mask:cint);cdecl;
-  Tcl_FileFreeProc = procedure(clientData:ClientData);cdecl;
-  Tcl_FreeInternalRepProc = procedure(objPtr:PTcl_Obj);cdecl;
-  Tcl_FreeProc = procedure(blockPtr:PChar);cdecl;
-  Tcl_IdleProc = procedure(clientData:ClientData);cdecl;
-  Tcl_InterpDeleteProc = procedure(clientData:ClientData; interp:PTcl_Interp);cdecl;
-  Tcl_MathProc = function(clientData:ClientData; interp:PTcl_Interp; args:PTcl_Value; resultPtr:PTcl_Value):cint;cdecl;
-  Tcl_NamespaceDeleteProc = procedure(clientData:ClientData);cdecl;
-  Tcl_ObjCmdProc = function(clientData:ClientData; interp:PTcl_Interp; objc:cint; objv:PPTcl_Obj):cint;cdecl;
-  Tcl_PackageInitProc = function(var interp:Tcl_Interp):cint;cdecl;
-  Tcl_PackageUnloadProc = function(var interp:Tcl_Interp; flags:cint):cint;cdecl;
-  Tcl_PanicProc = procedure(format:PChar; args:array of const);cdecl;
-  Tcl_TcpAcceptProc = procedure(callbackData:ClientData; chan:PTcl_Channel; address:PChar; port:cint);cdecl;
-  Tcl_TimerProc = procedure(clientData:ClientData);cdecl;
-  Tcl_SetFromAnyProc = function(interp:PTcl_Interp; objPtr:PTcl_Obj):cint;cdecl;
-  Tcl_UpdateStringProc = procedure(objPtr:PTcl_Obj);cdecl;
-  Tcl_VarTraceProc = function(clientData:ClientData; interp:PTcl_Interp; part1:PChar; part2:PChar; flags:cint):PChar;cdecl;
-  PTcl_CommandTraceProc = procedure(clientData:ClientData; interp:PTcl_Interp; oldName:PChar; newName:PChar; flags:cint);cdecl;
-  Tcl_CreateFileHandlerProc = procedure(fd:cint; mask:cint; proc:Tcl_FileProc; clientData:ClientData);cdecl;
-  Tcl_DeleteFileHandlerProc = procedure(fd:cint);cdecl;
-  Tcl_AlertNotifierProc = procedure(clientData:ClientData);cdecl;
-  Tcl_ServiceModeHookProc = procedure(mode:cint);cdecl;
-  Tcl_InitNotifierProc = Function:ClientData;cdecl;
-  Tcl_FinalizeNotifierProc = procedure(clientData:ClientData);cdecl;
-  Tcl_MainLoopProc = procedure;cdecl;
+            dst:PChar; dstLen:cint; srcReadPtr:pcint; var dstWrotePtr:cint; var dstCharsPtr:cint):cint;extdecl;
+  Tcl_EncodingFreeProc = procedure(clientData:ClientData);extdecl;
+  Tcl_EventProc = function(evPtr:PTcl_Event; flags:cint):cint;extdecl;
+  Tcl_EventCheckProc = procedure(clientData:ClientData; flags:cint);extdecl;
+  Tcl_EventDeleteProc = function(evPtr:PTcl_Event; clientData:ClientData):cint;extdecl;
+  Tcl_EventSetupProc = procedure(clientData:ClientData; flags:cint);extdecl;
+  Tcl_ExitProc = procedure(clientData:ClientData);extdecl;
+  Tcl_FileProc = procedure(clientData:ClientData; mask:cint);extdecl;
+  Tcl_FileFreeProc = procedure(clientData:ClientData);extdecl;
+  Tcl_FreeInternalRepProc = procedure(objPtr:PTcl_Obj);extdecl;
+  Tcl_FreeProc = procedure(blockPtr:PChar);extdecl;
+  Tcl_IdleProc = procedure(clientData:ClientData);extdecl;
+  Tcl_InterpDeleteProc = procedure(clientData:ClientData; interp:PTcl_Interp);extdecl;
+  Tcl_MathProc = function(clientData:ClientData; interp:PTcl_Interp; args:PTcl_Value; resultPtr:PTcl_Value):cint;extdecl;
+  Tcl_NamespaceDeleteProc = procedure(clientData:ClientData);extdecl;
+  Tcl_ObjCmdProc = function(clientData:ClientData; interp:PTcl_Interp; objc:cint; objv:PPTcl_Obj):cint;extdecl;
+  Tcl_PackageInitProc = function(var interp:Tcl_Interp):cint;extdecl;
+  Tcl_PackageUnloadProc = function(var interp:Tcl_Interp; flags:cint):cint;extdecl;
+  Tcl_PanicProc = procedure(format:PChar; args:array of const);extdecl;
+  Tcl_TcpAcceptProc = procedure(callbackData:ClientData; chan:PTcl_Channel; address:PChar; port:cint);extdecl;
+  Tcl_TimerProc = procedure(clientData:ClientData);extdecl;
+  Tcl_SetFromAnyProc = function(interp:PTcl_Interp; objPtr:PTcl_Obj):cint;extdecl;
+  Tcl_UpdateStringProc = procedure(objPtr:PTcl_Obj);extdecl;
+  Tcl_VarTraceProc = function(clientData:ClientData; interp:PTcl_Interp; part1:PChar; part2:PChar; flags:cint):PChar;extdecl;
+  PTcl_CommandTraceProc = procedure(clientData:ClientData; interp:PTcl_Interp; oldName:PChar; newName:PChar; flags:cint);extdecl;
+  Tcl_CreateFileHandlerProc = procedure(fd:cint; mask:cint; proc:Tcl_FileProc; clientData:ClientData);extdecl;
+  Tcl_DeleteFileHandlerProc = procedure(fd:cint);extdecl;
+  Tcl_AlertNotifierProc = procedure(clientData:ClientData);extdecl;
+  Tcl_ServiceModeHookProc = procedure(mode:cint);extdecl;
+  Tcl_InitNotifierProc = Function:ClientData;extdecl;
+  Tcl_FinalizeNotifierProc = procedure(clientData:ClientData);extdecl;
+  Tcl_MainLoopProc = procedure;extdecl;
 
 (*
  * The following structure represents a type of object, which is a particular
@@ -816,9 +823,9 @@ type
  * to compute or has side effects.
  *)
 
-procedure Tcl_IncrRefCount(objPtr:PTcl_Obj);cdecl;external;
-procedure Tcl_DecrRefCount(objPtr:PTcl_Obj);cdecl;external;
-function Tcl_IsShared(objPtr:PTcl_Obj):cint;cdecl;external;
+procedure Tcl_IncrRefCount(objPtr:PTcl_Obj);extdecl;external;
+procedure Tcl_DecrRefCount(objPtr:PTcl_Obj);extdecl;external;
+function Tcl_IsShared(objPtr:PTcl_Obj):cint;extdecl;external;
 
 (*
  * The following structure contains the state needed by Tcl_SaveResult. No-one
@@ -1154,10 +1161,10 @@ Type
   PTcl_HashTable = ^Tcl_HashTable;
   PTcl_HashEntry = ^Tcl_HashEntry;
 
-  Tcl_HashKeyProc = function(tablePtr:PTcl_HashTable; keyPtr:pointer):cuint;cdecl;
-  Tcl_CompareHashKeysProc = function(keyPtr:pointer; hPtr:PTcl_HashEntry):cint;cdecl;
-  Tcl_AllocHashEntryProc = function(tablePtr:PTcl_HashTable; keyPtr:pointer):PTcl_HashEntry;cdecl;
-  Tcl_FreeHashEntryProc = procedure(hPtr:PTcl_HashEntry);cdecl;
+  Tcl_HashKeyProc = function(tablePtr:PTcl_HashTable; keyPtr:pointer):cuint;extdecl;
+  Tcl_CompareHashKeysProc = function(keyPtr:pointer; hPtr:PTcl_HashEntry):cint;extdecl;
+  Tcl_AllocHashEntryProc = function(tablePtr:PTcl_HashTable; keyPtr:pointer):PTcl_HashEntry;extdecl;
+  Tcl_FreeHashEntryProc = procedure(hPtr:PTcl_HashEntry);extdecl;
 
 (*
  * Structure definition for an entry in a hash table. No-one outside Tcl
@@ -1239,8 +1246,8 @@ Type
  * fields in this structure.
  *)
 
-  Tcl_HashTableFindProc   = function (tablePtr:PTcl_HashTable; key:PChar):PTcl_HashEntry; cdecl;
-  Tcl_HashTableCreateProc = function (tablePtr:PTcl_HashTable; key:PChar; newPtr:pcint):PTcl_HashEntry; cdecl;
+  Tcl_HashTableFindProc   = function (tablePtr:PTcl_HashTable; key:PChar):PTcl_HashEntry; extdecl;
+  Tcl_HashTableCreateProc = function (tablePtr:PTcl_HashTable; key:PChar; newPtr:pcint):PTcl_HashEntry; extdecl;
   Tcl_HashTable = record
     buckets : ^PTcl_HashEntry;	(* Pointer to bucket array. Each element
 				 * points to first entry in bucket's hash
@@ -1370,15 +1377,15 @@ type
       usec : clong;		(* Microseconds. *)
     end;
 
-  Tcl_SetTimerProc = Procedure(timePtr:PTcl_Time); cdecl;
-  Tcl_WaitForEventProc = Function(timePtr:PTcl_Time):cint; cdecl;
+  Tcl_SetTimerProc = Procedure(timePtr:PTcl_Time); extdecl;
+  Tcl_WaitForEventProc = Function(timePtr:PTcl_Time):cint; extdecl;
 
 (*
  * TIP #233 (Virtualized Time)
  *)
 
-  Tcl_GetTimeProc   = Procedure(timebuf : PTcl_Time;clientData:ClientData); cdecl;
-  Tcl_ScaleTimeProc = Procedure(timebuf : PTcl_Time;clientData:ClientData); cdecl;
+  Tcl_GetTimeProc   = Procedure(timebuf : PTcl_Time;clientData:ClientData); extdecl;
+  Tcl_ScaleTimeProc = Procedure(timebuf : PTcl_Time;clientData:ClientData); extdecl;
 
 (*
  * Bits to pass to Tcl_CreateFileHandler and Tcl_CreateChannelHandler to
@@ -1439,28 +1446,28 @@ const
  *)
 
 Type
-  Tcl_DriverBlockModeProc = function(instanceData:ClientData; mode:cint):cint;cdecl;
-  Tcl_DriverCloseProc = function(instanceData:ClientData; interp:PTcl_Interp):cint;cdecl;
-  Tcl_DriverClose2Proc = function(instanceData:ClientData; interp:PTcl_Interp; flags:cint):cint;cdecl;
-  Tcl_DriverInputProc = function(instanceData:ClientData; buf:PChar; toRead:cint; errorCodePtr:pcint):cint;cdecl;
-  Tcl_DriverOutputProc = function(instanceData:ClientData; buf:PChar; toWrite:cint; errorCodePtr:pcint):cint;cdecl;
-  Tcl_DriverSeekProc = function(instanceData:ClientData; offset:clong; mode:cint; errorCodePtr:pcint):cint;cdecl;
-  Tcl_DriverSetOptionProc = function(instanceData:ClientData; interp:PTcl_Interp; optionName:PChar; value:PChar):cint;cdecl;
-  Tcl_DriverGetOptionProc = function(instanceData:ClientData; interp:PTcl_Interp; optionName:PChar; dsPtr:PTcl_DString):cint;cdecl;
-  Tcl_DriverWatchProc = procedure(instanceData:ClientData; mask:cint);cdecl;
-  Tcl_DriverGetHandleProc = function(instanceData:ClientData; direction:cint; Var handlePtr:ClientData):cint;cdecl;
-  Tcl_DriverFlushProc = function(instanceData:ClientData):cint;cdecl;
-  Tcl_DriverHandlerProc = function(instanceData:ClientData; interestMask:cint):cint;cdecl;
-  Tcl_DriverWideSeekProc = function(instanceData:ClientData; offset:Tcl_WideInt; mode:cint; errorCodePtr:pcint):Tcl_WideInt;cdecl;
+  Tcl_DriverBlockModeProc = function(instanceData:ClientData; mode:cint):cint;extdecl;
+  Tcl_DriverCloseProc = function(instanceData:ClientData; interp:PTcl_Interp):cint;extdecl;
+  Tcl_DriverClose2Proc = function(instanceData:ClientData; interp:PTcl_Interp; flags:cint):cint;extdecl;
+  Tcl_DriverInputProc = function(instanceData:ClientData; buf:PChar; toRead:cint; errorCodePtr:pcint):cint;extdecl;
+  Tcl_DriverOutputProc = function(instanceData:ClientData; buf:PChar; toWrite:cint; errorCodePtr:pcint):cint;extdecl;
+  Tcl_DriverSeekProc = function(instanceData:ClientData; offset:clong; mode:cint; errorCodePtr:pcint):cint;extdecl;
+  Tcl_DriverSetOptionProc = function(instanceData:ClientData; interp:PTcl_Interp; optionName:PChar; value:PChar):cint;extdecl;
+  Tcl_DriverGetOptionProc = function(instanceData:ClientData; interp:PTcl_Interp; optionName:PChar; dsPtr:PTcl_DString):cint;extdecl;
+  Tcl_DriverWatchProc = procedure(instanceData:ClientData; mask:cint);extdecl;
+  Tcl_DriverGetHandleProc = function(instanceData:ClientData; direction:cint; Var handlePtr:ClientData):cint;extdecl;
+  Tcl_DriverFlushProc = function(instanceData:ClientData):cint;extdecl;
+  Tcl_DriverHandlerProc = function(instanceData:ClientData; interestMask:cint):cint;extdecl;
+  Tcl_DriverWideSeekProc = function(instanceData:ClientData; offset:Tcl_WideInt; mode:cint; errorCodePtr:pcint):Tcl_WideInt;extdecl;
 
 (*
  * TIP #218, Channel Thread Actions
  *)
-  Tcl_DriverThreadActionProc = Procedure(instanceData:ClientData;action:cint); cdecl;
+  Tcl_DriverThreadActionProc = Procedure(instanceData:ClientData;action:cint); extdecl;
 (*
  * TIP #208, File Truncation (etc.)
  *)
-  Tcl_DriverTruncateProc = Function(instanceData:ClientData;length:Tcl_WideInt):cint; cdecl;
+  Tcl_DriverTruncateProc = Function(instanceData:ClientData;length:Tcl_WideInt):cint; extdecl;
 
 (*
  * struct Tcl_ChannelType:
@@ -1617,35 +1624,35 @@ type
   PClientData = ^ClientData;
 (* We have to declare the utime structure here. *)
 
-  Tcl_FSStatProc = function(pathPtr:PTcl_Obj; buf:PTcl_StatBuf):cint;cdecl;
-  Tcl_FSAccessProc = function(pathPtr:PTcl_Obj; mode:cint):cint;cdecl;
-  Tcl_FSOpenFileChannelProc = function(interp:PTcl_Interp; pathPtr:PTcl_Obj; mode:cint; permissions:cint):PTcl_Channel;cdecl;
-  Tcl_FSMatchInDirectoryProc = function(interp:PTcl_Interp; result:PTcl_Obj; pathPtr:PTcl_Obj; pattern:PChar; types:PTcl_GlobTypeData):cint;cdecl;
-  Tcl_FSGetCwdProc = function(interp:PTcl_Interp):PTcl_Obj;cdecl;
-  Tcl_FSChdirProc = function(pathPtr:PTcl_Obj):cint;cdecl;
-  Tcl_FSLstatProc = function(pathPtr:PTcl_Obj; buf:PTcl_StatBuf):cint;cdecl;
-  Tcl_FSCreateDirectoryProc = function(pathPtr:PTcl_Obj):cint;cdecl;
-  Tcl_FSDeleteFileProc = function(pathPtr:PTcl_Obj):cint;cdecl;
-  Tcl_FSCopyDirectoryProc = function(srcPathPtr:PTcl_Obj; destPathPtr:PTcl_Obj; errorPtr:PPTcl_Obj):cint;cdecl;
-  Tcl_FSCopyFileProc = function(srcPathPtr:PTcl_Obj; destPathPtr:PTcl_Obj):cint;cdecl;
-  Tcl_FSRemoveDirectoryProc = function(pathPtr:PTcl_Obj; recursive:cint; errorPtr:PPTcl_Obj):cint;cdecl;
-  Tcl_FSRenameFileProc = function(srcPathPtr:PTcl_Obj; destPathPtr:PTcl_Obj):cint;cdecl;
-  Tcl_FSUnloadFileProc = procedure(loadHandle:PTcl_LoadHandle);cdecl;
-  Tcl_FSListVolumesProc = function:PTcl_Obj;cdecl;
-  Tcl_FSUtimeProc = function(pathPtr:PTcl_Obj; tval:Putimbuf):cint;cdecl;
-  Tcl_FSNormalizePathProc = function(interp:PTcl_Interp; pathPtr:PTcl_Obj; nextCheckpoint:cint):cint;cdecl;
-  Tcl_FSFileAttrsGetProc = function(interp:PTcl_Interp; index:cint; pathPtr:PTcl_Obj; objPtrRef:PPTcl_Obj):cint;cdecl;
-  Tcl_FSFileAttrStringsProc = function(pathPtr:PTcl_Obj; objPtrRef:PPTcl_Obj):pPChar;cdecl;
-  Tcl_FSFileAttrsSetProc = function(interp:PTcl_Interp; index:cint; pathPtr:PTcl_Obj; objPtr:PTcl_Obj):cint;cdecl;
-  Tcl_FSLinkProc = function(pathPtr:PTcl_Obj; toPtr:PTcl_Obj; linkType:cint):PTcl_Obj;cdecl;
-  Tcl_FSLoadFileProc = function(interp:PTcl_Interp; pathPtr:PTcl_Obj; handlePtr:PTcl_LoadHandle; unloadProcPtr:Tcl_FSUnloadFileProc):cint;cdecl;
-  Tcl_FSPathInFilesystemProc = function(pathPtr:PTcl_Obj; clientDataPtr:PClientData):cint;cdecl;
-  Tcl_FSFilesystemPathTypeProc = function(pathPtr:PTcl_Obj):PTcl_Obj;cdecl;
-  Tcl_FSFilesystemSeparatorProc = function(pathPtr:PTcl_Obj):PTcl_Obj;cdecl;
-  Tcl_FSFreeInternalRepProc = procedure(clientData:ClientData);cdecl;
-  Tcl_FSDupInternalRepProc = function(clientData:ClientData):ClientData;cdecl;
-  Tcl_FSInternalToNormalizedProc = function(clientData:ClientData):PTcl_Obj;cdecl;
-  Tcl_FSCreateInternalRepProc = function(pathPtr:PTcl_Obj):ClientData;cdecl;
+  Tcl_FSStatProc = function(pathPtr:PTcl_Obj; buf:PTcl_StatBuf):cint;extdecl;
+  Tcl_FSAccessProc = function(pathPtr:PTcl_Obj; mode:cint):cint;extdecl;
+  Tcl_FSOpenFileChannelProc = function(interp:PTcl_Interp; pathPtr:PTcl_Obj; mode:cint; permissions:cint):PTcl_Channel;extdecl;
+  Tcl_FSMatchInDirectoryProc = function(interp:PTcl_Interp; result:PTcl_Obj; pathPtr:PTcl_Obj; pattern:PChar; types:PTcl_GlobTypeData):cint;extdecl;
+  Tcl_FSGetCwdProc = function(interp:PTcl_Interp):PTcl_Obj;extdecl;
+  Tcl_FSChdirProc = function(pathPtr:PTcl_Obj):cint;extdecl;
+  Tcl_FSLstatProc = function(pathPtr:PTcl_Obj; buf:PTcl_StatBuf):cint;extdecl;
+  Tcl_FSCreateDirectoryProc = function(pathPtr:PTcl_Obj):cint;extdecl;
+  Tcl_FSDeleteFileProc = function(pathPtr:PTcl_Obj):cint;extdecl;
+  Tcl_FSCopyDirectoryProc = function(srcPathPtr:PTcl_Obj; destPathPtr:PTcl_Obj; errorPtr:PPTcl_Obj):cint;extdecl;
+  Tcl_FSCopyFileProc = function(srcPathPtr:PTcl_Obj; destPathPtr:PTcl_Obj):cint;extdecl;
+  Tcl_FSRemoveDirectoryProc = function(pathPtr:PTcl_Obj; recursive:cint; errorPtr:PPTcl_Obj):cint;extdecl;
+  Tcl_FSRenameFileProc = function(srcPathPtr:PTcl_Obj; destPathPtr:PTcl_Obj):cint;extdecl;
+  Tcl_FSUnloadFileProc = procedure(loadHandle:PTcl_LoadHandle);extdecl;
+  Tcl_FSListVolumesProc = function:PTcl_Obj;extdecl;
+  Tcl_FSUtimeProc = function(pathPtr:PTcl_Obj; tval:Putimbuf):cint;extdecl;
+  Tcl_FSNormalizePathProc = function(interp:PTcl_Interp; pathPtr:PTcl_Obj; nextCheckpoint:cint):cint;extdecl;
+  Tcl_FSFileAttrsGetProc = function(interp:PTcl_Interp; index:cint; pathPtr:PTcl_Obj; objPtrRef:PPTcl_Obj):cint;extdecl;
+  Tcl_FSFileAttrStringsProc = function(pathPtr:PTcl_Obj; objPtrRef:PPTcl_Obj):pPChar;extdecl;
+  Tcl_FSFileAttrsSetProc = function(interp:PTcl_Interp; index:cint; pathPtr:PTcl_Obj; objPtr:PTcl_Obj):cint;extdecl;
+  Tcl_FSLinkProc = function(pathPtr:PTcl_Obj; toPtr:PTcl_Obj; linkType:cint):PTcl_Obj;extdecl;
+  Tcl_FSLoadFileProc = function(interp:PTcl_Interp; pathPtr:PTcl_Obj; handlePtr:PTcl_LoadHandle; unloadProcPtr:Tcl_FSUnloadFileProc):cint;extdecl;
+  Tcl_FSPathInFilesystemProc = function(pathPtr:PTcl_Obj; clientDataPtr:PClientData):cint;extdecl;
+  Tcl_FSFilesystemPathTypeProc = function(pathPtr:PTcl_Obj):PTcl_Obj;extdecl;
+  Tcl_FSFilesystemSeparatorProc = function(pathPtr:PTcl_Obj):PTcl_Obj;extdecl;
+  Tcl_FSFreeInternalRepProc = procedure(clientData:ClientData);extdecl;
+  Tcl_FSDupInternalRepProc = function(clientData:ClientData):ClientData;extdecl;
+  Tcl_FSInternalToNormalizedProc = function(clientData:ClientData):PTcl_Obj;extdecl;
+  Tcl_FSCreateInternalRepProc = function(pathPtr:PTcl_Obj):ClientData;extdecl;
 
   PTcl_FSVersion = ^Tcl_FSVersion;
   Tcl_FSVersion = record End;
@@ -2211,8 +2218,8 @@ Const
  *)
 
 Type
-  Tcl_LimitHandlerProc = Procedure (clientData:ClientData;interp:PTcl_Interp);cdecl;
-  Tcl_LimitHandlerDeleteProc = Procedure(clientData:ClientData);cdecl;
+  Tcl_LimitHandlerProc = Procedure (clientData:ClientData;interp:PTcl_Interp);extdecl;
+  Tcl_LimitHandlerDeleteProc = Procedure(clientData:ClientData);extdecl;
 
 type
   Pmp_int = ^mp_int;
@@ -2240,10 +2247,10 @@ Const
  *)
 
 function Tcl_InitStubs(var interp:Tcl_Interp;
-			version:PChar; exact:cint):PChar;cdecl;external;
+			version:PChar; exact:cint):PChar;extdecl;external;
 function TclTomMathInitializeStubs(
 			    var interp:Tcl_Interp; version:PChar;
-			    epoch:cint; revision:cint):PChar;cdecl;external;
+			    epoch:cint; revision:cint):PChar;extdecl;external;
 
 {$ifndef USE_TCL_STUBS}
 
@@ -2266,10 +2273,10 @@ function TclTomMathInitializeStubs(
  * Tcl_GetMemoryInfo is needed for AOLserver. [Bug 1868171]
  *)
 
-procedure Tcl_Main(argc:cint; argv:PPChar; var appInitProc:Tcl_AppInitProc);cdecl;external;
-function Tcl_PkgInitStubsCheck(var interp:Tcl_Interp; version:PChar; exact:cint):PChar;cdecl;external;
+procedure Tcl_Main(argc:cint; argv:PPChar; var appInitProc:Tcl_AppInitProc);extdecl;external;
+function Tcl_PkgInitStubsCheck(var interp:Tcl_Interp; version:PChar; exact:cint):PChar;extdecl;external;
 {$if defined(TCL_THREADS) and defined(USE_THREAD_ALLOC)}
-procedure Tcl_GetMemoryInfo(var dsPtr:Tcl_DString);cdecl;external;
+procedure Tcl_GetMemoryInfo(var dsPtr:Tcl_DString);extdecl;external;
 {$endif}
 
 (*
@@ -2369,7 +2376,7 @@ Function  Tcl_GetHashKey  (tablePtr:PTcl_HashTable;h : PTcl_HashEntry) : PChar; 
  * neither DLLEXPORT nor DLLIMPORT.
  *)
 
-function Tcl_AppInit(var interp:Tcl_Interp):cint;cdecl;external;
+function Tcl_AppInit(var interp:Tcl_Interp):cint;extdecl;external;
 
 implementation
 

@@ -1,0 +1,7 @@
+*.ico
+*.res
+*.lpi
+lib/
+demo1
+demo2
+demo3
