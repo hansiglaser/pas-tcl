@@ -823,9 +823,9 @@ type
  * to compute or has side effects.
  *)
 
-procedure Tcl_IncrRefCount(objPtr:PTcl_Obj);extdecl;external;
-procedure Tcl_DecrRefCount(objPtr:PTcl_Obj);extdecl;external;
-function Tcl_IsShared(objPtr:PTcl_Obj):cint;extdecl;external;
+Procedure Tcl_IncrRefCount(objPtr:PTcl_Obj); inline;
+procedure Tcl_DecrRefCount(objPtr:PTcl_Obj); inline;
+function Tcl_IsShared(objPtr:PTcl_Obj):Boolean; inline;
 
 (*
  * The following structure contains the state needed by Tcl_SaveResult. No-one
@@ -2581,6 +2581,30 @@ begin
   Tcl_NewWideIntObj:=Tcl_DbNewWideIntObj(val,__FILE__,__LINE__);
 end;
 *)
+
+{$ifdef TCL_MEM_DEBUG}
+  // tcl.h uses #defines to override these three functions to use Tcl_Db*(objPtr, __FILE__, __LINE__)
+{$ELSE}
+
+// tcl.h defines macros for Tcl_IncrRefCount, Tcl_DecrRefCount and Tcl_IsShared
+Procedure Tcl_IncrRefCount(objPtr:PTcl_Obj); inline;
+Begin
+  Inc(objPtr^.refCount);
+End;
+
+Procedure Tcl_DecrRefCount(objPtr:PTcl_Obj); inline;
+Begin
+  Dec(objPtr^.refCount);
+  if objPtr^.refCount <= 0 then
+    TclFreeObj(objPtr);
+End;
+
+Function Tcl_IsShared(objPtr:PTcl_Obj):Boolean; inline;
+Begin
+  Result := (objPtr^.refCount > 1);
+End;
+
+{$ENDIF}
 
 Function  Tcl_GetHashValue(h : PTcl_HashEntry) : ClientData; inline;
 Begin

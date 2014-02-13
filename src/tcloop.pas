@@ -135,6 +135,7 @@ Type
      *)
     Procedure ListObjAppendList   (listPtr:PTcl_Obj; elemListPtr:PTcl_Obj);
     Procedure ListObjAppendElement(listPtr:PTcl_Obj; objPtr:PTcl_Obj);
+    Procedure ListObjAppendElement(listPtr:PTcl_Obj; St:String);
     Function  NewListObj          (                 objc:Integer; objv:PPTcl_Obj):PTcl_Obj;
     Procedure SetListObj          (objPtr:PTcl_Obj; objc:Integer; objv:PPTcl_Obj);
     Procedure ListObjGetElements  (listPtr:PTcl_Obj; Out objc:Integer; Out objv:PPTcl_Obj);
@@ -226,6 +227,10 @@ Type
     Constructor Create;
     Constructor Create(ATclObj : PTcl_Obj);
     Procedure InvalidateString;
+    Procedure IncrRefCount;
+    Procedure DecrRefCount;
+    Function  IsShared : Boolean;
+    Procedure InvalidateStringRep;
     class Function  IsMyType(ATclObj : PTcl_Obj) : Boolean;
     class Function  IsMyType(ATclObj : TTcl_Object) : Boolean;
     property TclObj : PTcl_Obj read FTclObj;
@@ -295,9 +300,11 @@ Begin
     on E : Exception do
       Begin
         ProcInfo^.TCL.SetResult(E.Message);     // replace previous error strings in result (instead of AppendResult)
+        DumpExceptionBackTrace(StdErr);
         Result := TCL_ERROR;
       End;
   End;
+  Flush(Output);
 End;
 
 (**
@@ -415,6 +422,11 @@ Procedure TTCLInterpreter.ListObjAppendElement(listPtr:PTcl_Obj;objPtr:PTcl_Obj)
 Begin
   if Tcl_ListObjAppendElement(FInterp,listPtr,objPtr) <> TCL_OK then
     raise Exception.Create(Tcl_GetStringResult(FInterp));
+End;
+
+Procedure TTCLInterpreter.ListObjAppendElement(listPtr:PTcl_Obj;St:String);
+Begin
+  ListObjAppendElement(listPtr,Tcl_NewStringObj(PChar(St),Length(St)));
 End;
 
 Function TTCLInterpreter.NewListObj(objc:Integer;objv:PPTcl_Obj):PTcl_Obj;
@@ -691,6 +703,26 @@ Begin
   Tcl_InvalidateStringRep(FTclObj);
 End;
 
+Procedure TTCLObj.IncrRefCount;
+Begin
+  Tcl_IncrRefCount(FTclObj);
+End;
+
+Procedure TTCLObj.DecrRefCount;
+Begin
+  Tcl_DecrRefCount(FTclObj);
+End;
+
+Function TTCLObj.IsShared:Boolean;
+Begin
+  Tcl_IsShared(FTclObj);
+End;
+
+Procedure TTCLObj.InvalidateStringRep;
+Begin
+  Tcl_InvalidateStringRep(FTclObj);
+End;
+
 class Function TTCLObj.IsMyType(ATclObj:PTcl_Obj):Boolean;
 Begin
   Result := (ATclObj^.typePtr = GetTypePtr);
@@ -721,7 +753,7 @@ End;
 Function SetFromAnyProc(Interp:PTcl_Interp;Obj:PTcl_Obj):Integer;extdecl;
 Var MyObj : TTclObj;
 Begin
-WriteLn('SetFromAny');
+//WriteLn('SetFromAny');
   MyObj := TTCLObj.Create(Obj);   // create new instance, remove old internal representation, set us as new internal representation
   // TODO: check wheter we have this method overridden, i.e. non-abstract any more, otherwise return TCL_ERROR
   Result := MyObj.SetFromAny(Interp);
@@ -730,7 +762,7 @@ End;
 Procedure UpdateStringProc(Obj:PTcl_Obj);extdecl;
 Var St : String;
 Begin
-WriteLn('UpdateString');
+//WriteLn('UpdateString');
   St := TTCLObj.Get(Obj).UpdateString;
   { Obj^.Bytes is Nil, we have to set it non-Nil }
   Obj^.Bytes  := Tcl_Alloc(Length(St)+1);   // http://www.tcl.tk/man/tcl8.5/TclLib/Alloc.htm
@@ -742,7 +774,7 @@ Procedure DupIntRepProc(Src:PTcl_Obj;Dst:PTcl_Obj);extdecl;
 Var SrcData,DstData : TTclObj;
     SrcClass        : TTCLObjClass;
 Begin
-WriteLn('DupIntRep');
+//WriteLn('DupIntRep');
   SrcData := TTCLObj.Get(Src);
   SrcClass := TTCLObjClass(SrcData.ClassType);
   DstData := SrcClass.Create(Dst);
@@ -752,7 +784,7 @@ End;
 
 Procedure FreeIntRepProc(Obj:PTcl_Obj);extdecl;
 Begin
-WriteLn('MyDataFreeIntRep');
+//WriteLn('MyDataFreeIntRep');
   TTCLObj.Get(Obj).Free;
 End;
 
