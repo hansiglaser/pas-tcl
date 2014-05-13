@@ -76,6 +76,7 @@ Type
   // information record for all custom TCL commands implemented in Pascal
   PTclCmdProcInfo = ^TTclCmdProcInfo;
   TTclCmdProcInfo = record
+    Name    : String;
     TCL     : TTCLInterpreter;
     Proc    : TObjCmdProc;
     DelProc : TCmdDeleteProc;
@@ -119,6 +120,8 @@ Type
     Function  GetObjResult : PTcl_Obj;
     Function  GetStringResult : String;
     Function  Eval(Script : String) : Integer;
+
+    Function  GetErrorLine : Integer;
 
     //procedure AppendResult(args: array of PChar);
     Procedure AppendResult(St:String);
@@ -291,6 +294,7 @@ End;
  *)
 Function CmdCaller(clientData:ClientData;interp:pTcl_Interp;objc:Integer;objv:PPTcl_Obj): Integer; extdecl;
 Var ProcInfo : PTclCmdProcInfo;
+    I        : Integer;
 Begin
   ProcInfo := PTclCmdProcInfo(clientData);
   try
@@ -299,8 +303,18 @@ Begin
   except  // catch exceptions and "convert" to a TCL error
     on E : Exception do
       Begin
-        ProcInfo^.TCL.SetResult(E.Message);     // replace previous error strings in result (instead of AppendResult)
+        ProcInfo^.TCL.SetResult(ProcInfo^.Name+': '+E.Message);     // replace previous error strings in result (instead of AppendResult)
+        Flush(Output); Flush(ErrOutput); Flush(StdOut); Flush(StdErr);
+        //WriteLn(StdErr,'ErrNo = ',Tcl_GetErrno);
+        Write(StdErr,'Error in call to "',PPTcl_Object(ObjV)^[0].AsString);
+        For I := 1 to ObjC do
+          Write(StdErr,' ',PPTcl_Object(ObjV)^[I].AsString);
+        WriteLn(StdErr,'":');
+        WriteLn(StdErr,'  ',E.Message);
+        WriteLn(StdErr,'Exception stack backtrace:');
         DumpExceptionBackTrace(StdErr);
+        //WriteLn(StdErr,'Current stack backtrace:');
+        //Dump_Stack(StdErr,get_frame);
         Result := TCL_ERROR;
       End;
   End;
@@ -333,6 +347,7 @@ Function TTCLInterpreter.CreateObjCommand(CmdName:String;Proc:TObjCmdProc;Delete
 Var ProcInfo : PTclCmdProcInfo;
 Begin
   ProcInfo := NewProc;
+  ProcInfo^.Name    := CmdName;
   ProcInfo^.TCL     := Self;
   ProcInfo^.Proc    := Proc;
   ProcInfo^.DelProc := DeleteProc;
@@ -358,6 +373,11 @@ End;
 Function TTCLInterpreter.Eval(Script:String):Integer;
 Begin
   Result := Tcl_EvalEx(FInterp,PChar(Script),Length(Script),TCL_EVAL_DIRECT);
+End;
+
+Function TTCLInterpreter.GetErrorLine:Integer;
+Begin
+  Result := FInterp^.errorLine;
 End;
 
 (*Procedure TTCLInterpreter.AppendResult(args:Array Of PChar);
