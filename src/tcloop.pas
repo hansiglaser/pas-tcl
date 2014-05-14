@@ -307,7 +307,7 @@ Begin
         Flush(Output); Flush(ErrOutput); Flush(StdOut); Flush(StdErr);
         //WriteLn(StdErr,'ErrNo = ',Tcl_GetErrno);
         Write(StdErr,'Error in call to "',PPTcl_Object(ObjV)^[0].AsString);
-        For I := 1 to ObjC do
+        For I := 1 to ObjC-1 do
           Write(StdErr,' ',PPTcl_Object(ObjV)^[I].AsString);
         WriteLn(StdErr,'":');
         WriteLn(StdErr,'  ',E.Message);
