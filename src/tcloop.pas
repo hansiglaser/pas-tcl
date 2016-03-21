@@ -247,6 +247,7 @@ Procedure FreeIntRepProc  (Obj:PTcl_Obj); extdecl;
 { helpber functions }
 
 Procedure VarDump(Obj:PTcl_Obj);
+Function GetCmdLine(ObjC:Integer;ObjV:PPTcl_Object):String;
 
 Implementation
 
@@ -306,10 +307,7 @@ Begin
         ProcInfo^.TCL.SetResult(ProcInfo^.Name+': '+E.Message);     // replace previous error strings in result (instead of AppendResult)
         Flush(Output); Flush(ErrOutput); Flush(StdOut); Flush(StdErr);
         //WriteLn(StdErr,'ErrNo = ',Tcl_GetErrno);
-        Write(StdErr,'Error in call to "',PPTcl_Object(ObjV)^[0].AsString);
-        For I := 1 to ObjC-1 do
-          Write(StdErr,' ',PPTcl_Object(ObjV)^[I].AsString);
-        WriteLn(StdErr,'":');
+        WriteLn(StdErr,'Error in call to "',GetCmdLine(ObjC,PPTcl_Object(ObjV)),'":');
         WriteLn(StdErr,'  ',E.Message);
         WriteLn(StdErr,'Exception stack backtrace:');
         DumpExceptionBackTrace(StdErr);
@@ -841,6 +839,14 @@ Begin
         Write(' (',Obj^.typePtr^.name,')');
       WriteLn;
     End;
+End;
+
+Function GetCmdLine(ObjC:Integer;ObjV:PPTcl_Object):String;
+Var I : Integer;
+Begin
+  Result := ObjV^[0].AsString;
+  For I := 1 to ObjC-1 do
+    Result += ' ' + ObjV^[I].AsString;
 End;
 
 End.
